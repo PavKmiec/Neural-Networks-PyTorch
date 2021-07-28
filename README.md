@@ -1,2 +1,2 @@
 # Neural-Networks-PyTorch
-Neural networks with PyTorch
+Learning Neural networks with PyTorch
