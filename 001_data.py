@@ -4,9 +4,11 @@ from torchvision import transforms, datasets
 import matplotlib.pyplot as plt
 import torch.nn as nn
 import torch.nn.functional as F
+import torch.optim as optim
 
 '''
-Data
+A very hogh-level example of how to use the PyTorch
+with their sample dataset.
 '''
 
 # download training data
@@ -94,7 +96,65 @@ print(output)
 
 # print(net)
 
+'''
+learning rate (lr): 
+    is a hyperparameter that controls the step size that
+    the optimizer takes at each iteration -
+    - optimize to lower the loss but only 
+    take certain size steps
+
+'''
+optimizer = optim.Adam(net.parameters(), lr=0.001)
 
 
+
+# epoch - a full pass through the data set 
+EPOCHS = 3
+
+# 3 passes through the data set
+for e in range(EPOCHS):
+    # data is a batch of featuresets and labels
+    for data in trainset:
+        X, y = data
+        # zero/reset gradients (i)
+        # gradients indicate how wrong the model is
+        net.zero_grad()
+        output = net(X.view(-1, 28*28))
+        # calculate loss
+        # nnl_loss function (i)
+        loss = F.nll_loss(output, y)
+        # backpropagate the loss
+        loss.backward()
+        # update the weights
+        optimizer.step()
+    print("Loss: ", loss)
+
+correct = 0
+total = 0
+
+# when validating we dont want the gradients to be calulated
+# because we are only validating the model
+# its out of sample/testing data
+
+'''
+for every predition that we get 
+does it match the target,
+if it does, then we add 1 to the correct
+'''
+with torch.no_grad():
+    for data in trainset:
+        X, y = data
+        output = net(X.view(-1, 784))
+        for idx, i in enumerate(output):
+            if torch.argmax(i) == y[idx]:
+                correct += 1
+            total += 1
+
+print("Accuracy: ", round(correct/total, 3))
+# show a sample
+plt.imshow(X[0].view(28, 28))
+plt.show()
+
+print(torch.argmax(net(X.view(-1, 784))[0]))
 
 
